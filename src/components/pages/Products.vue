@@ -48,10 +48,10 @@
                                         <input type="text" class="form-control" id="inputImageUrl" aria-describedby="imgHelp" placeholder="請輸入圖片連結" v-model="tempProduct.imageUrl">
                                     </div>
                                     <div class="custom-file">
-                                        <input type="file" class="custom-file-input" id="customFile" ref="files">
-                                        <label class="custom-file-label" for="customFile" @change="uploadFile">或上傳圖片</label>
+                                        <input type="file" class="custom-file-input" id="customFile" ref="files" @change="uploadFile">
+                                        <label class="custom-file-label" for="customFile">或上傳圖片</label>
                                     </div>
-                                    <img :src="tempProduct.imgUrl" alt="" class="img-fluid">
+                                    <img :src="tempProduct.imageUrl" alt="" class="img-fluid mt-2">
                                 </div>
                                 <div class="col-md-8">
                                     <div class="row">
@@ -112,8 +112,8 @@
                         </div>
                     </div>
                     <div class="modal-footer">
-                        <button type="button" class="btn btn-secondary" data-dismiss="modal">Close</button>
-                        <button type="button" class="btn btn-primary" @click="updateProduct">Save changes</button>
+                        <button type="button" class="btn btn-secondary" data-dismiss="modal">取消</button>
+                        <button type="button" class="btn btn-primary" @click="updateProduct">確認</button>
                     </div>
                 </div>
             </div>
@@ -199,10 +199,24 @@
       },
 
       uploadFile() {
-        const _this = this;
-        const uploadFile = _this.$ref.files;
-        console.log(uploadFile);
-
+        const _this      = this;
+        const uploadFile = _this.$refs.files.files[0];
+        const url        = `${process.env.VUE_APP_API}/api/${process.env.VUE_APP_CUSTOM}/admin/upload`;
+        const formDate   = new FormData();
+        formDate.append('file-to-upload', uploadFile);
+        this.axios.post(url, formDate, {
+          headers: {
+            'Content-Type': 'multipart/form-data'
+          }
+        }).then((response) => {
+          if (response.data.success) {
+            console.log(response.data.success);
+            _this.$set(_this.tempProduct, 'imageUrl', response.data.imageUrl);
+          }
+          console.log(response.data.success,response.data.message);
+        }).catch((error) => {
+          console.log(error);
+        });
       }
 
 
