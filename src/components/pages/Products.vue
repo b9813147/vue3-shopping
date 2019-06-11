@@ -1,5 +1,6 @@
 <template>
     <div>
+        <loading :active.sync="isLoading"></loading>
         <div class="text-right mt-4">
             <button type="button" class="btn btn-purple" @click="openModal(true)">建立新產品</button>
         </div>
@@ -49,7 +50,9 @@
                                     </div>
                                     <div class="custom-file">
                                         <input type="file" class="custom-file-input" id="customFile" ref="files" @change="uploadFile">
-                                        <label class="custom-file-label" for="customFile">或上傳圖片</label>
+                                        <label class="custom-file-label" for="customFile">或上傳圖片
+                                            <i class="fas fa-spinner fa-spin" v-if="status.fileUploading"></i>
+                                        </label>
                                     </div>
                                     <img :src="tempProduct.imageUrl" alt="" class="img-fluid mt-2">
                                 </div>
@@ -130,24 +133,27 @@
       return {
         products   : [],
         tempProduct: {},
-        isNew      : false
-      }
+        isNew      : false,
+        isLoading  : false,
+        status     : {
+          fileUploading: false
+        }
+      };
     },
     methods: {
       getProducts() {
-        const api   = `${process.env.VUE_APP_API}/api/${process.env.VUE_APP_CUSTOM}/products/all`;
-        const _this = this;
+        const api       = `${process.env.VUE_APP_API}/api/${process.env.VUE_APP_CUSTOM}/products/all`;
+        const _this     = this;
+        _this.isLoading = true;
         this.axios.get(api).then((response) => {
-
-          _this.products = response.data.products;
-
+          _this.products  = response.data.products;
+          _this.isLoading = false;
         }).catch((error) => {
           console.log(error);
         });
       },
 
       openModal(isNew, item) {
-
         if (isNew) {
           this.tempProduct = {};
           this.isNew       = true;
@@ -192,7 +198,6 @@
             this.getProducts();
             console.log('刪除失敗')
           }
-
         }).catch((error) => {
           console.log(error);
         })
@@ -203,6 +208,9 @@
         const uploadFile = _this.$refs.files.files[0];
         const url        = `${process.env.VUE_APP_API}/api/${process.env.VUE_APP_CUSTOM}/admin/upload`;
         const formDate   = new FormData();
+
+        _this.status.fileUploading = true;
+
         formDate.append('file-to-upload', uploadFile);
         this.axios.post(url, formDate, {
           headers: {
@@ -210,19 +218,23 @@
           }
         }).then((response) => {
           if (response.data.success) {
-            console.log(response.data.success);
+
             _this.$set(_this.tempProduct, 'imageUrl', response.data.imageUrl);
+
+            _this.status.fileUploading = false;
+            this.$bus.$emit('message:push','上傳成功', 'success');
+          }else {
+            _this.status.fileUploading = false;
+            this.$bus.$emit('message:push', response.data.message, 'danger');
           }
-          console.log(response.data.success,response.data.message);
         }).catch((error) => {
           console.log(error);
         });
       }
-
-
     },
     created() {
       this.getProducts();
+
     }
   }
 </script>
