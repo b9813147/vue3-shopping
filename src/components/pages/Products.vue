@@ -30,6 +30,8 @@
             </tr>
             </tbody>
         </table>
+        <!-- pagination -->
+        <Pagination :pagination="pagination" @getPageProducts="getProducts"/>
         <!-- Modal -->
         <div class="modal fade" id="productModal" tabindex="-1" role="dialog" aria-labelledby="productModalLabel" aria-hidden="true">
             <div class="modal-dialog modal-lg" role="document">
@@ -125,10 +127,11 @@
 </template>
 
 <script>
-  import $ from 'jquery';
+  import $          from 'jquery';
+  import Pagination from './Pagination';
 
   export default {
-    name   : "Products",
+    name      : "Products",
     data() {
       return {
         products   : [],
@@ -137,17 +140,19 @@
         isLoading  : false,
         status     : {
           fileUploading: false
-        }
+        },
+        pagination : {}
       };
     },
-    methods: {
-      getProducts() {
-        const api       = `${process.env.VUE_APP_API}/api/${process.env.VUE_APP_CUSTOM}/products/all`;
+    methods   : {
+      getProducts(page = 1) {
+        const api       = `${process.env.VUE_APP_API}/api/${process.env.VUE_APP_CUSTOM}/admin/products?page=${page}`;
         const _this     = this;
         _this.isLoading = true;
         this.axios.get(api).then((response) => {
-          _this.products  = response.data.products;
-          _this.isLoading = false;
+          _this.products   = response.data.products;
+          _this.pagination = response.data.pagination;
+          _this.isLoading  = false;
         }).catch((error) => {
           console.log(error);
         });
@@ -222,8 +227,8 @@
             _this.$set(_this.tempProduct, 'imageUrl', response.data.imageUrl);
 
             _this.status.fileUploading = false;
-            this.$bus.$emit('message:push','上傳成功', 'success');
-          }else {
+            this.$bus.$emit('message:push', '上傳成功', 'success');
+          } else {
             _this.status.fileUploading = false;
             this.$bus.$emit('message:push', response.data.message, 'danger');
           }
@@ -235,6 +240,9 @@
     created() {
       this.getProducts();
 
+    },
+    components: {
+      Pagination,
     }
   }
 </script>
