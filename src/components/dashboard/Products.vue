@@ -128,7 +128,7 @@
 
 <script>
   import $          from 'jquery'
-  import Pagination from './Pagination'
+  import Pagination from '../app/Pagination'
 
   export default {
     name      : 'Products',

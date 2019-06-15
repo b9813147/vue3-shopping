@@ -14,7 +14,7 @@ export default new Router({
     {
       path     : '/login',
       name     : 'login',
-      component: () => import('./components/pages/Login')
+      component: () => import('./components/app/Login')
     },
     {
       path     : '/admin',
@@ -25,7 +25,7 @@ export default new Router({
           path     : 'products',
           name     : 'products',
           // component: Products,
-          component: () => import ('./components/pages/Products'),
+          component: () => import ('./components/dashboard/Products'),
           meta     : {requiresAuth: true},
         }
       ]

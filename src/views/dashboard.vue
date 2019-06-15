@@ -16,9 +16,9 @@
 </template>
 
 <script>
-  import Navbar  from '../components/pages/Navbar';
-  import Sidebar from '../components/pages/Sidebar';
-  import Alert   from '../components/pages/AlertMessage';
+  import Navbar  from '../components/app/Navbar';
+  import Sidebar from '../components/app/Sidebar';
+  import Alert   from '../components/app/AlertMessage';
 
 
   export default {
