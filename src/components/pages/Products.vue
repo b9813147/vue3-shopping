@@ -19,8 +19,8 @@
             <tr v-for="(item) in products" :key="item.id">
                 <td>{{ item.category }}</td>
                 <td>{{ item.title }}</td>
-                <td class="text-right">{{ item.origin_price }}</td>
-                <td class="text-right">{{ item.price }}</td>
+                <td class="text-right">{{ item.origin_price | currency }}</td>
+                <td class="text-right">{{ item.price | currency }}</td>
                 <td v-if="item.is_enabled === 1" class="text-success">啟用</td>
                 <td v-else class="text-danger">停用</td>
                 <td>
@@ -127,12 +127,12 @@
 </template>
 
 <script>
-  import $          from 'jquery';
-  import Pagination from './Pagination';
+  import $          from 'jquery'
+  import Pagination from './Pagination'
 
   export default {
-    name      : "Products",
-    data() {
+    name      : 'Products',
+    data () {
       return {
         products   : [],
         tempProduct: {},
@@ -142,81 +142,81 @@
           fileUploading: false
         },
         pagination : {}
-      };
+      }
     },
     methods   : {
-      getProducts(page = 1) {
-        const api       = `${process.env.VUE_APP_API}/api/${process.env.VUE_APP_CUSTOM}/admin/products?page=${page}`;
-        const _this     = this;
-        _this.isLoading = true;
+      getProducts (page = 1) {
+        const api       = `${process.env.VUE_APP_API}/api/${process.env.VUE_APP_CUSTOM}/admin/products?page=${page}`
+        const _this     = this
+        _this.isLoading = true
         this.axios.get(api).then((response) => {
-          _this.products   = response.data.products;
-          _this.pagination = response.data.pagination;
-          _this.isLoading  = false;
+          _this.products   = response.data.products
+          _this.pagination = response.data.pagination
+          _this.isLoading  = false
         }).catch((error) => {
-          console.log(error);
-        });
-      },
-
-      openModal(isNew, item) {
-        if (isNew) {
-          this.tempProduct = {};
-          this.isNew       = true;
-        } else {
-          this.tempProduct = Object.assign({}, item);
-          this.isNew       = false;
-        }
-        $('#productModal').modal('show');
-      },
-
-      updateProduct() {
-        let api        = `${process.env.VUE_APP_API}/api/${process.env.VUE_APP_CUSTOM}/admin/product`;
-        let httpMethod = 'post';
-        const _this    = this;
-
-        if (!_this.isNew) {
-          api        = `${process.env.VUE_APP_API}/api/${process.env.VUE_APP_CUSTOM}/admin/product/${_this.tempProduct.id}`;
-          httpMethod = 'put';
-        }
-
-        this.axios[httpMethod](api, {data: _this.tempProduct}).then((response) => {
-          if (response.data.success) {
-            $('#productModal').modal('hide');
-            _this.getProducts();
-          } else {
-            $('#productModal').modal('hide');
-            _this.getProducts();
-            console.log('新增失敗');
-          }
-        }).catch((error) => {
-          console.log(error);
+          console.log(error)
         })
       },
 
-      deleteProduct(item) {
-        const api = `${process.env.VUE_APP_API}/api/${process.env.VUE_APP_CUSTOM}/admin/product/${item.id}`;
-        console.log(api);
+      openModal (isNew, item) {
+        if (isNew) {
+          this.tempProduct = {}
+          this.isNew       = true
+        } else {
+          this.tempProduct = Object.assign({}, item)
+          this.isNew       = false
+        }
+        $('#productModal').modal('show')
+      },
+
+      updateProduct () {
+        let api        = `${process.env.VUE_APP_API}/api/${process.env.VUE_APP_CUSTOM}/admin/product`
+        let httpMethod = 'post'
+        const _this    = this
+
+        if (!_this.isNew) {
+          api        = `${process.env.VUE_APP_API}/api/${process.env.VUE_APP_CUSTOM}/admin/product/${_this.tempProduct.id}`
+          httpMethod = 'put'
+        }
+
+        this.axios[httpMethod](api, { data: _this.tempProduct }).then((response) => {
+          if (response.data.success) {
+            $('#productModal').modal('hide')
+            _this.getProducts()
+          } else {
+            $('#productModal').modal('hide')
+            _this.getProducts()
+            console.log('新增失敗')
+          }
+        }).catch((error) => {
+          console.log(error)
+        })
+      },
+
+      deleteProduct (item) {
+        const api = `${process.env.VUE_APP_API}/api/${process.env.VUE_APP_CUSTOM}/admin/product/${item.id}`
+        console.log(api)
         this.axios.delete(api).then((response) => {
           if (response.data.success) {
-            this.getProducts();
+            this.getProducts()
           } else {
-            this.getProducts();
+            this.getProducts()
             console.log('刪除失敗')
           }
         }).catch((error) => {
-          console.log(error);
+          console.log(error)
         })
       },
 
-      uploadFile() {
-        const _this      = this;
-        const uploadFile = _this.$refs.files.files[0];
-        const url        = `${process.env.VUE_APP_API}/api/${process.env.VUE_APP_CUSTOM}/admin/upload`;
-        const formDate   = new FormData();
+      uploadFile () {
+        const _this      = this
+        const uploadFile = _this.$refs.files.files[0]
+        const url        = `${process.env.VUE_APP_API}/api/${process.env.VUE_APP_CUSTOM}/admin/upload`
+        const formDate   = new FormData()
 
-        _this.status.fileUploading = true;
+        _this.status.fileUploading = true
 
-        formDate.append('file-to-upload', uploadFile);
+        formDate.append('file-to-upload', uploadFile)
         this.axios.post(url, formDate, {
           headers: {
             'Content-Type': 'multipart/form-data'
@@ -224,21 +224,21 @@
         }).then((response) => {
           if (response.data.success) {
 
-            _this.$set(_this.tempProduct, 'imageUrl', response.data.imageUrl);
+            _this.$set(_this.tempProduct, 'imageUrl', response.data.imageUrl)
 
-            _this.status.fileUploading = false;
-            this.$bus.$emit('message:push', '上傳成功', 'success');
+            _this.status.fileUploading = false
+            this.$bus.$emit('message:push', '上傳成功', 'success')
           } else {
-            _this.status.fileUploading = false;
-            this.$bus.$emit('message:push', response.data.message, 'danger');
+            _this.status.fileUploading = false
+            this.$bus.$emit('message:push', response.data.message, 'danger')
           }
         }).catch((error) => {
-          console.log(error);
-        });
+          console.log(error)
+        })
       }
     },
-    created() {
-      this.getProducts();
+    created () {
+      this.getProducts()
 
     },
     components: {
