@@ -10,21 +10,23 @@
                 </h6>
                 <ul class="nav flex-column">
                     <li class="nav-item">
-                        <router-link to="/admin/products" class="nav-link active">
+                        <router-link to="/admin/products" class="nav-link"
+                                     :class="{ active: ('products'=== current)?true:false}">
                             <i class="fas fa-box-open"></i>
                             產品列表
                         </router-link>
-                    </li>
-                    <li class="nav-item">
-                        <router-link to="/admin/products" class="nav-link">
+
+                        <router-link to="/admin/orders" class="nav-link"
+                                     :class="{ active: ('Orders'=== current)?true:false}">
                             <i class="fas fa-list-alt"></i>
                             訂單列表
                         </router-link>
                     </li>
                     <li class="nav-item">
-                        <router-link to="/admin/products" class="nav-link">
+                        <router-link to="/admin/coupons" class="nav-link"
+                                     :class="{ active:('coupons' === current)?true:false}">
                             <i class="fas fa-ticket-alt"></i>
-                         優惠券
+                            優惠券
                         </router-link>
                     </li>
                 </ul>
@@ -37,11 +39,8 @@
                 </h6>
                 <ul class="nav flex-column mb-2">
                     <li class="nav-item">
-                        <a class="nav-link" href="#">
-                            <span data-feather="file-text"></span>
-
-                        </a>
-                        <router-link to="" class="nav-link">
+                        <router-link to="/custom_order" class="nav-link"
+                                     :class="{ active: ('custom_order'=== current)?true:false}">
                             <i class="fas fa-shopping-cart"></i>
                             模擬訂單
                         </router-link>
@@ -54,7 +53,21 @@
 
 <script>
   export default {
-    name: "Sidebar"
+    name : 'Sidebar',
+    data () {
+      return {
+        current: ''
+
+      }
+    },
+    watch: {
+      '$route' (to, from) {
+        this.current = to.name
+      }
+    },
+    mounted () {
+      this.current = this.$route.name
+    }
   }
 </script>
 
