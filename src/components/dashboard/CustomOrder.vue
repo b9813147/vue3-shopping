@@ -53,9 +53,9 @@
                     </td>
                     <td class="align-middle">
                         {{ item.product.title }}
-                        <!-- <div class="text-success" v-if="item.coupon">
-                          已套用優惠券
-                        </div> -->
+                        <div class="text-success" v-if="item.coupon">
+                            已套用優惠券
+                        </div>
                     </td>
                     <td class="align-middle">{{ item.qty }}/{{ item.product.unit }}</td>
                     <td class="align-middle text-right">{{ item.final_total }}</td>
@@ -82,7 +82,55 @@
                 </div>
             </div>
         </div>
+        <div class="my-5 row justify-content-center">
+            <form class="col-md-6" @submit.prevent="createOder">
+                <div class="form-group">
+                    <label for="useremail">Email</label>
+                    <input type="email" class="form-control" name="email" id="useremail"
+                           :class="{ 'is-invalid': errors.has('email') }"
+                           v-model="form.user.email" placeholder="請輸入 Email"
+                           v-validate="'required|email'"
+                    >
+                    <span class="text-danger" v-if="errors.has('email')">{{ errors.first('email') }}</span>
+                </div>
 
+                <div class="form-group">
+                    <label for="username">收件人姓名</label>
+                    <input type="text" class="form-control" name="name" id="username"
+                           :class="{ 'is-invalid': errors.has('name') }"
+                           v-model="form.user.name" placeholder="輸入姓名"
+                           v-validate="'required|alpha'"
+                    >
+                    <span class="text-danger" v-show="errors.has('name')">姓名必須輸入</span>
+                </div>
+
+                <div class="form-group">
+                    <label for="usertel">收件人電話</label>
+                    <input type="tel" class="form-control" id="usertel" v-model="form.user.tel" placeholder="請輸入電話">
+                </div>
+
+                <div class="form-group">
+                    <label for="useraddress">收件人地址</label>
+                    <input type="text" id="useraddress" class="form-control"
+                           name="address"
+                           v-model="form.user.address"
+                           :class="{ 'is-invalid': errors.has('address') }"
+                           placeholder="請輸入地址"
+                           v-validate="'required'"
+                    >
+                    <span class="text-danger" v-if="errors.has('address')">地址欄位不得留空</span>
+                </div>
+
+                <div class="form-group">
+                    <label for="comment">留言</label>
+                    <textarea name="" id="comment" class="form-control" cols="30" rows="10"
+                              v-model="form.message"></textarea>
+                </div>
+                <div class="text-right">
+                    <button class="btn btn-danger">送出訂單</button>
+                </div>
+            </form>
+        </div>
 
         <!-- Modal -->
         <div class="modal fade" id="productModal" tabindex="-1" role="dialog" aria-labelledby="productModalLabel"
@@ -145,9 +193,17 @@
         status     : {
           loadingItem: true
         },
+        form       : {
+          user   : {
+            name   : '',
+            email  : '',
+            tel    : '',
+            address: ''
+          },
+          message: ''
+        },
         cart       : {},
-        coupon_code: ''
-
+        coupon_code: '',
       }
     },
     methods: {
@@ -190,7 +246,9 @@
           _this.status.loadingItem = ''
           $('#productModal').modal('hide')
           _this.getCart()
-        }).catch((error) => {console.log(error)})
+        }).catch((error) => {
+          console.log(error)
+        })
       },
 
       getCart () {
@@ -202,7 +260,9 @@
           _this.cart = response.data.data
 
           _this.isLoading = false
-        }).catch((error) => {console.log(error)})
+        }).catch((error) => {
+          console.log(error)
+        })
       },
 
       removeCartItem (id) {
@@ -213,21 +273,49 @@
         this.axios.delete(url).then((response) => {
           _this.getCart()
           _this.isLoading = false
-        }).catch((error) => {console.log(error)})
+        }).catch((error) => {
+          console.log(error)
+        })
       },
 
       addCouponCode () {
-        const _this = this
-        const url   = `${process.env.VUE_APP_API}/api/${process.env.VUE_APP_CUSTOM}/coupon`
-        let coupon  = {
+        const _this     = this
+        const url       = `${process.env.VUE_APP_API}/api/${process.env.VUE_APP_CUSTOM}/coupon`
+        _this.isLoading = true
+        let coupon      = {
           code: _this.coupon_code
         }
         this.axios.post(url, { data: coupon }).then((response) => {
           console.log(response)
-        }).catch((error) => {console.log(error)})
-
+          this.getCart()
+          _this.isLoading = false
+        }).catch((error) => {
+          console.log(error)
+        })
       },
 
+      createOder () {
+        const _this     = this
+        const url       = `${process.env.VUE_APP_API}/api/${process.env.VUE_APP_CUSTOM}/order`
+        // _this.isLoading = true
+        let order       = _this.form
+        //驗證
+        this.$validator.validateAll().then((result) => {
+          if (result) {
+            // eslint-disable-next-line
+            this.axios.post(url, { data: order })
+              .then((response) => {
+              // console.log('訂單已建立', response)
+              if (response.data.success) {
+                _this.$router.push(`/customer_checkout/${response.data.orderId}`)
+              }
+              _this.isLoading = false
+            })
+              .catch((error) => {console.log(error)})
+          }
+        })
+
+      },
       init () {
         this.getProducts()
         this.getCart()
@@ -236,7 +324,10 @@
     },
     created () {
       this.init()
-    }
+      // 測試
+      let api ='https://api.myjson.com/bins/87bkh';
+      this.axios.get(api).then((response) => {console.log(response)})
+    },
 
   }
 </script>

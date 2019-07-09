@@ -7,26 +7,21 @@
         <table class="table mt-4">
             <thead>
             <tr>
-                <th width="120">分類</th>
-                <th>產品名稱</th>
-                <th width="120">原價</th>
-                <th width="120">售價</th>
-                <th width="100">是否啟用</th>
-                <th width="160">編輯</th>
+                <th>購買時間</th>
+                <th>Email</th>
+                <th>購買事項</th>
+                <th>應付金額</th>
+                <th>是否付款</th>
             </tr>
             </thead>
             <tbody>
             <tr v-for="(item) in products" :key="item.id">
-                <td>{{ item.category }}</td>
-                <td>{{ item.title }}</td>
-                <td class="text-right">{{ item.origin_price | currency }}</td>
-                <td class="text-right">{{ item.price | currency }}</td>
-                <td v-if="item.is_enabled === 1" class="text-success">啟用</td>
-                <td v-else class="text-danger">停用</td>
-                <td>
-                    <a href="#" class="btn btn-outline-purple btn-sm mr-2" @click="openModal(false,item)">編輯</a>
-                    <a href="#" class="btn btn-outline-danger btn-sm" @click="deleteProduct(item)">刪除</a>
-                </td>
+                <td>{{ item.create_at }}</td>
+                <td>{{ item.email }}</td>
+                <td>{{ item.total }}</td>
+                <td class="text-right">{{ item.total | currency }}</td>
+                <td v-if="item.is_paid" class="text-success">已付款</td>
+                <td v-else class="text-danger">尚未付款</td>
             </tr>
             </tbody>
         </table>
@@ -41,7 +36,7 @@
     data () {
       return {
         isLoading    : false,
-        products    : [],
+        products     : [],
         tempOrderList: {}
 
       }
@@ -50,13 +45,22 @@
       getOrderList (page = 1) {
         const _this = this
         const url   = `${process.env.VUE_APP_API}/api/${process.env.VUE_APP_CUSTOM}/admin/orders?page=${page}`
-                        // /api/:api_path/admin/orders?page=:page
+        // /api/:api_path/admin/orders?page=:page
         _this.axios.get(url).then((response) => {
-          // _this.products = response.data
-          console.log(response)
-
+          let dataOrders = []
+          response.data.orders.forEach((iterm) => {
+            dataOrders.push({
+              create_at: moment.unix(iterm.paid_date).format('YYYY-MM-DD'),
+              email    : iterm.user.email,
+              product  : iterm.products,
+              total    : iterm.total,
+              is_paid  : iterm.is_paid
+            })
+          })
+          console.log(dataOrders)
+          _this.products = dataOrders
         })
-
+          .catch((error) => {console.log(error)})
       }
     },
     mounted () {

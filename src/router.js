@@ -48,11 +48,16 @@ export default new Router({
       path     : '/',
       name     : 'dashboard',
       component: () => import('./views/dashboard'),
-      children : [
+      children: [
         {
           path     : 'custom_order',
           name     : 'custom_order',
           component: () => import('./components/dashboard/CustomOrder'),
+        },
+        {
+          path     : 'customer_checkout/:orderId',
+          name     : 'customerCheckout',
+          component: () => import('./components/dashboard/CustomerCheckout'),
         }
       ],
 
