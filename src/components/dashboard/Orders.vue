@@ -1,27 +1,28 @@
 <template>
     <div>
         <!--        <loading :active.sync="isLoading"></loading>-->
-        <div class="text-right mt-4">
-            <button type="button" class="btn btn-purple" @click="openModal(true)">建立新產品</button>
-        </div>
         <table class="table mt-4">
             <thead>
             <tr>
                 <th>購買時間</th>
                 <th>Email</th>
-                <th>購買事項</th>
+                <th>購買款項</th>
                 <th>應付金額</th>
                 <th>是否付款</th>
             </tr>
             </thead>
             <tbody>
             <tr v-for="(item) in products" :key="item.id">
-                <td>{{ item.create_at }}</td>
-                <td>{{ item.email }}</td>
-                <td>{{ item.total }}</td>
-                <td class="text-right">{{ item.total | currency }}</td>
+                <td v-if="item.is_paid">{{ item.create_at }}</td>
+                <td v-else class="text-secondary">{{ item.create_at }}</td>
+                <td v-if="item.is_paid">{{ item.email }}</td>
+                <td v-else class="text-secondary">{{ item.email }}</td>
+                <td v-if="item.is_paid">{{ item.message }}</td>
+                <td v-else class="text-secondary">{{ item.message }}</td>
+                <td v-if="item.is_paid" class="text-right">{{ item.total | currency }}</td>
+                <td v-else class="text-right text-secondary">{{ item.total | currency }}</td>
                 <td v-if="item.is_paid" class="text-success">已付款</td>
-                <td v-else class="text-danger">尚未付款</td>
+                <td v-else class="text-secondary">尚未付款</td>
             </tr>
             </tbody>
         </table>
@@ -50,14 +51,14 @@
           let dataOrders = []
           response.data.orders.forEach((iterm) => {
             dataOrders.push({
-              create_at: moment.unix(iterm.paid_date).format('YYYY-MM-DD'),
+              create_at: moment.unix(iterm.create_at).format('YYYY-MM-DD'),
               email    : iterm.user.email,
               product  : iterm.products,
               total    : iterm.total,
-              is_paid  : iterm.is_paid
+              is_paid  : iterm.is_paid,
+              message  : iterm.message,
             })
           })
-          console.log(dataOrders)
           _this.products = dataOrders
         })
           .catch((error) => {console.log(error)})

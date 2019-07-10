@@ -295,22 +295,22 @@
       },
 
       createOder () {
-        const _this     = this
-        const url       = `${process.env.VUE_APP_API}/api/${process.env.VUE_APP_CUSTOM}/order`
+        const _this = this
+        const url   = `${process.env.VUE_APP_API}/api/${process.env.VUE_APP_CUSTOM}/order`
         // _this.isLoading = true
-        let order       = _this.form
+        let order   = _this.form
         //驗證
         this.$validator.validateAll().then((result) => {
           if (result) {
             // eslint-disable-next-line
             this.axios.post(url, { data: order })
               .then((response) => {
-              // console.log('訂單已建立', response)
-              if (response.data.success) {
-                _this.$router.push(`/customer_checkout/${response.data.orderId}`)
-              }
-              _this.isLoading = false
-            })
+                // console.log('訂單已建立', response)
+                if (response.data.success) {
+                  _this.$router.push(`/customer_checkout/${response.data.orderId}`)
+                }
+                _this.isLoading = false
+              })
               .catch((error) => {console.log(error)})
           }
         })
@@ -324,9 +324,6 @@
     },
     created () {
       this.init()
-      // 測試
-      let api ='https://api.myjson.com/bins/87bkh';
-      this.axios.get(api).then((response) => {console.log(response)})
     },
 
   }

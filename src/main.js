@@ -49,23 +49,20 @@ new Vue({
   render: h => h(App)
 }).$mount('#app')
 
-router.beforeEach((to, from, next) => {
-  if (to.meta.requiresAuth) {
-    const checkApi = `${process.env.VUE_APP_API}/api/user/check`
-    axios.post(checkApi).then((response) => {
-      // console.log(response.data.success, response.data);
-      if (response.data.success) {
-        next()
-      } else {
-        next({
-          path: '/login'
-        })
-      }
-    }).catch((error) => {
 
-    })
+/* 驗證 登入 */
+router.beforeEach((to, from, next) => {
+  // 驗證登入API 位址
+  const checkApi = `${process.env.VUE_APP_API}/api/user/check`
+  //判斷是否允許
+  if (to.meta.requiresAuth) {
+    axios.post(checkApi)
+      .then((response) => {
+         (response.data.success) ? next() : next({ path: '/login' })
+      })
+      .catch((error) => {console.log(error)})
   } else {
-    next()
+     next()
   }
 })
 
