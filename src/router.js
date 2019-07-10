@@ -21,7 +21,6 @@ export default new Router({
       path     : '/admin',
       name     : 'dashboard',
       component: () => import('./views/dashboard'),
-      meta     : { requiresAuth: true },
       children : [
         {
           path     : 'products',
