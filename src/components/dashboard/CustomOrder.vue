@@ -324,6 +324,11 @@
     },
     created () {
       this.init()
+      let api ='https://api.myjson.com/bins/87bkh';
+
+      this.axios.get(api).then((response) => {console.log(response)})// 取不到資料
+
+      $.get(api, (response) => {console.log(response)}) //取得到資料
     },
 
   }
